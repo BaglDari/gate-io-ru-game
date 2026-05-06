@@ -57,13 +57,11 @@ body {
   overflow: hidden;
 }
 @keyframes coinFall {
-  0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
-  8%   { opacity: 0.45; }
-  92%  { opacity: 0.25; }
-  100% { transform: translateY(110vh) rotate(420deg); opacity: 0; }
+  0%   { transform: translateY(-40px) rotate(0deg); opacity: 0.4; }
+  100% { transform: translateY(110vh) rotate(420deg); opacity: 0.1; }
 }
 .coin-rain { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-.coin-rain span { position: absolute; top: 0; animation: coinFall linear infinite; opacity: 0; }
+.coin-rain span { position: absolute; top: 0; animation: coinFall linear infinite; }
 
 .splash-brand { width: 100%; text-align: center; z-index: 1; flex-shrink: 0; }
 
@@ -935,7 +933,7 @@ function renderScreen1() {
   var coinHtml = '';
   for (var i = 0; i < 14; i++) {
     var left  = (4 + Math.random() * 88).toFixed(1);
-    var delay = (Math.random() * 9).toFixed(2);
+    var delay = (-parseFloat(dur) * Math.random()).toFixed(2);
     var dur   = (7 + Math.random() * 7).toFixed(1);
     var size  = (12 + Math.random() * 10).toFixed(0);
     coinHtml += '<span style="left:' + left + '%;animation-delay:' + delay + 's;animation-duration:' + dur + 's;font-size:' + size + 'px">' + symbols[i % symbols.length] + '</span>';

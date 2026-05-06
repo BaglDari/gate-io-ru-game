@@ -123,6 +123,24 @@ body {
 }
 .btn-secondary:active { opacity: 0.75; }
 
+/* ======= CTA CARD ======= */
+.cta-card {
+  display: flex; align-items: center;
+  width: 100%; padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  text-decoration: none; color: inherit;
+  gap: 14px; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.cta-card:active { opacity: 0.8; transform: scale(0.98); }
+.cta-card-icon { font-size: 30px; flex-shrink: 0; line-height: 1; }
+.cta-card-text { flex: 1; text-align: left; }
+.cta-card-sub { display: block; font-size: 11px; color: var(--accent-green); font-weight: 700; margin-bottom: 3px; letter-spacing: 0.2px; }
+.cta-card-main { display: block; font-size: 16px; font-weight: 800; color: var(--text-primary); }
+.cta-card-arrow { font-size: 22px; color: var(--text-secondary); font-weight: 300; flex-shrink: 0; }
+
 /* ======= SCREEN 2: GAME ======= */
 #screen-2 { padding: 0; gap: 0; }
 
@@ -446,9 +464,11 @@ function fmtShort(asset, v) {
 function drawChart() {
   var canvas = document.getElementById('chart');
   if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var W = canvas.width, H = canvas.height;
-  var MR = 60;
+  var dpr   = canvas._dpr || 1;
+  var ctx   = canvas.getContext('2d');
+  var W     = canvas._cssW || canvas.width;
+  var H     = canvas._cssH || canvas.height;
+  var MR    = 60;
   var plotW = W - MR;
 
   var hist = state.histPts;
@@ -463,11 +483,13 @@ function drawChart() {
     if (all[i] > max) max = all[i];
   }
   min *= 0.9991; max *= 1.0009;
-  var rng = max - min || 1;
+  var rng    = max - min || 1;
   var totalN = HIST_N + (rev.length > 0 ? REV_N : 0);
 
   function sy(v) { return H - ((v - min) / rng) * H * 0.82 - H * 0.09; }
 
+  ctx.save();
+  ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, W, H);
 
   // Grid
@@ -477,45 +499,15 @@ function drawChart() {
     ctx.beginPath(); ctx.moveTo(0, H * f); ctx.lineTo(plotW, H * f); ctx.stroke();
   });
 
-  // Split dashed vertical (always shown in predicting or revealing)
+  // Split dashed vertical
   var showSplit = rev.length > 0 || state.phase === 'predicting';
-  var splitX = ((HIST_N - 1) / (totalN - 1)) * plotW;
+  var splitX    = ((HIST_N - 1) / (totalN - 1)) * plotW;
   if (showSplit) {
     ctx.strokeStyle = 'rgba(255,255,255,0.18)';
     ctx.setLineDash([4, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(splitX, 0); ctx.lineTo(splitX, H); ctx.stroke();
     ctx.setLineDash([]);
-  }
-
-  // UP/DOWN hint zones (only during predicting phase, before prediction made)
-  if (state.phase === 'predicting') {
-    var zoneX = splitX + 2;
-    var zoneW = plotW - splitX - 2;
-
-    // UP zone — top half green
-    var gUp = ctx.createLinearGradient(zoneX, 0, zoneX, H / 2);
-    gUp.addColorStop(0, 'rgba(0,212,170,0.18)');
-    gUp.addColorStop(1, 'rgba(0,212,170,0.02)');
-    ctx.fillStyle = gUp;
-    ctx.fillRect(zoneX, 0, zoneW, H / 2);
-
-    // DOWN zone — bottom half red
-    var gDn = ctx.createLinearGradient(zoneX, H / 2, zoneX, H);
-    gDn.addColorStop(0, 'rgba(255,77,106,0.02)');
-    gDn.addColorStop(1, 'rgba(255,77,106,0.18)');
-    ctx.fillStyle = gDn;
-    ctx.fillRect(zoneX, H / 2, zoneW, H / 2);
-
-    // Labels
-    var lx = zoneX + zoneW / 2;
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 13px system-ui';
-    ctx.fillStyle = 'rgba(0,212,170,0.85)';
-    ctx.fillText('↑ ВВЕРХ', lx, H * 0.25);
-    ctx.fillStyle = 'rgba(255,77,106,0.85)';
-    ctx.fillText('↓ ВНИЗ', lx, H * 0.80);
-    ctx.textAlign = 'left';
   }
 
   // Horizontal price line
@@ -565,8 +557,8 @@ function drawChart() {
 
     // Arrow at end of full reveal
     if (rc >= rev.length) {
-      var ax = ((HIST_N + rev.length - 1) / (totalN - 1)) * plotW;
-      var ay = sy(rev[rev.length - 1]);
+      var ax   = ((HIST_N + rev.length - 1) / (totalN - 1)) * plotW;
+      var ay   = sy(rev[rev.length - 1]);
       var goUp = rev[rev.length - 1] > hist[hist.length - 1];
       ctx.fillStyle = isWin() ? '#00d4aa' : '#ff4d6a';
       ctx.beginPath();
@@ -597,14 +589,74 @@ function drawChart() {
     ctx.fill();
   }
 
+  // Fork visualization — predicting phase
+  if (state.phase === 'predicting') {
+    var ly     = sy(hist[hist.length - 1]);
+    var fx1    = plotW - 10;
+    var spread = H * 0.28;
+    var upY    = Math.max(H * 0.1,  ly - spread);
+    var dnY    = Math.min(H * 0.88, ly + spread);
+
+    // Subtle background tints
+    var zX  = splitX + 1;
+    var zW2 = plotW - splitX - 1;
+    var gU  = ctx.createLinearGradient(zX, 0, zX, H / 2);
+    gU.addColorStop(0, 'rgba(0,212,170,0.08)');
+    gU.addColorStop(1, 'rgba(0,212,170,0)');
+    ctx.fillStyle = gU; ctx.fillRect(zX, 0, zW2, H / 2);
+    var gD  = ctx.createLinearGradient(zX, H / 2, zX, H);
+    gD.addColorStop(0, 'rgba(255,77,106,0)');
+    gD.addColorStop(1, 'rgba(255,77,106,0.08)');
+    ctx.fillStyle = gD; ctx.fillRect(zX, H / 2, zW2, H / 2);
+
+    // Dashed fork branches
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = 'rgba(0,212,170,0.7)';
+    ctx.beginPath(); ctx.moveTo(splitX, ly); ctx.lineTo(fx1, upY); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,77,106,0.7)';
+    ctx.beginPath(); ctx.moveTo(splitX, ly); ctx.lineTo(fx1, dnY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrowheads
+    var forkArrow = function(x2, y2, x1, y1, col) {
+      var ang = Math.atan2(y2 - y1, x2 - x1);
+      var sz  = 8;
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - sz * Math.cos(ang - 0.42), y2 - sz * Math.sin(ang - 0.42));
+      ctx.lineTo(x2 - sz * Math.cos(ang + 0.42), y2 - sz * Math.sin(ang + 0.42));
+      ctx.closePath(); ctx.fill();
+    };
+    forkArrow(fx1, upY, splitX, ly, 'rgba(0,212,170,0.9)');
+    forkArrow(fx1, dnY, splitX, ly, 'rgba(255,77,106,0.9)');
+
+    // Circle at branch origin
+    ctx.beginPath();
+    ctx.arc(splitX, ly, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#3d7fff';
+    ctx.fill();
+
+    // Labels
+    var midX = (splitX + fx1) / 2;
+    ctx.font = 'bold 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0,212,170,0.9)';
+    ctx.fillText('↑ ВВЕРХ', midX, upY - 7);
+    ctx.fillStyle = 'rgba(255,77,106,0.9)';
+    ctx.fillText('↓ ВНИЗ', midX, dnY + 13);
+    ctx.textAlign = 'left';
+  }
+
   // Price labels
   var levels = [max, (max + min) / 2, min];
-  ctx.font = '10px system-ui';
+  ctx.font = '11px system-ui';
   ctx.textAlign = 'left';
   levels.forEach(function(v) {
     var y = sy(v);
     if (Math.abs(y - currentY) < 16) return;
-    ctx.fillStyle = 'rgba(136,146,164,0.7)';
+    ctx.fillStyle = 'rgba(136,146,164,0.75)';
     ctx.fillText(fmtShort(state.asset, v), plotW + 3, y + 3);
   });
 
@@ -613,8 +665,10 @@ function drawChart() {
   rrect(ctx, plotW + 1, currentY - 9, MR - 2, 18, 4);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 10px system-ui';
+  ctx.font = 'bold 11px system-ui';
   ctx.fillText(fmtShort(state.asset, all[all.length - 1]), plotW + 5, currentY + 4);
+
+  ctx.restore();
 }
 
 function startChartLoop() {
@@ -627,6 +681,18 @@ function startChartLoop() {
 
 function stopChartLoop() {
   if (state.chartRAF) { cancelAnimationFrame(state.chartRAF); state.chartRAF = null; }
+}
+
+function initChartCanvas() {
+  var canvas = document.getElementById('chart');
+  if (!canvas) return;
+  var dpr  = Math.min(window.devicePixelRatio || 1, 3);
+  var cssW = Math.round(canvas.offsetWidth) || 416;
+  canvas.width  = cssW * dpr;
+  canvas.height = 180 * dpr;
+  canvas._dpr  = dpr;
+  canvas._cssW = cssW;
+  canvas._cssH = 180;
 }
 
 /* ===================== TIMER ===================== */
@@ -766,6 +832,7 @@ function goToGameRound() {
   initRound();
   renderScreen2();
   showScreen(2);
+  initChartCanvas();
   startTimer();
   startChartLoop();
 }
@@ -832,6 +899,7 @@ function switchAsset(key) {
   state.newsIdx = Math.floor(Math.random() * NEWS[key].length);
   stopTimer();
   renderScreen2();
+  initChartCanvas();
   startTimer();
 }
 
@@ -844,9 +912,14 @@ function renderLoseScreen() {
     '<div class="result-amount amount-neg">Раунд 1 — промах</div>' +
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
     '<div class="result-btns">' +
-      '<button class="btn-pay" onclick="goToPay()">Продолжить за 5 000 🪙</button>' +
-      '<a href="' + buildCTAUrl() + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">' +
-        '<button class="btn-secondary">Скачать Gate.io и получить 120 USDT →</button>' +
+      '<button class="btn-pay" onclick="confirmPay()">Продолжить за 5 000 🪙</button>' +
+      '<a class="cta-card" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
+        '<span class="cta-card-icon">📈</span>' +
+        '<span class="cta-card-text">' +
+          '<span class="cta-card-sub">Готов к реальному трейдингу?</span>' +
+          '<span class="cta-card-main">Попробуй Gate.io</span>' +
+        '</span>' +
+        '<span class="cta-card-arrow">›</span>' +
       '</a>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
@@ -901,8 +974,13 @@ function renderWinScreen() {
         ? '<button class="btn-cta" onclick="goToBonus()">🎁 Забрать 120 USDT бонус!</button>'
         : '<button class="btn-primary" onclick="goNextRound()">Следующий раунд →</button>'
       ) +
-      '<a href="' + buildCTAUrl() + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">' +
-        '<button class="btn-secondary">Скачать Gate.io и получить 120 USDT →</button>' +
+      '<a class="cta-card" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
+        '<span class="cta-card-icon">📈</span>' +
+        '<span class="cta-card-text">' +
+          '<span class="cta-card-sub">Готов к реальному трейдингу?</span>' +
+          '<span class="cta-card-main">Попробуй Gate.io</span>' +
+        '</span>' +
+        '<span class="cta-card-arrow">›</span>' +
       '</a>' +
     '</div>';
 

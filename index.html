@@ -62,7 +62,7 @@ body {
 .splash-hero {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 52%;
+  height: 38%;
   display: flex; align-items: center; justify-content: center;
 }
 
@@ -79,8 +79,13 @@ body {
 .gate-logo span { color: var(--accent-green); }
 
 .splash-tagline { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent-blue); margin-bottom: 8px; }
-.splash-headline { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+.splash-headline { font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
 .splash-sub { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; padding: 0 8px; }
+.splash-usdt { font-size: 46px; font-weight: 900; color: var(--accent-green); line-height: 1; margin-bottom: 4px; letter-spacing: -1px; }
+.splash-usdt-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 14px; letter-spacing: 0.3px; }
+.splash-balance-line { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+.splash-balance-line strong { color: var(--accent-green); font-weight: 700; }
+.splash-trust { font-size: 11px; color: rgba(136,146,164,0.7); margin-top: 10px; margin-bottom: 0; }
 
 .balance-badge {
   display: inline-flex; align-items: center; gap: 6px;
@@ -357,10 +362,10 @@ canvas#confetti-canvas { position: absolute; inset: 0; width: 100%; height: 100%
 /* ===================== DATA ===================== */
 
 var ASSETS = {
-  BTC:  { price: 94250.30, change: '+2.3%', pos: true,  community: { bears: 72, bulls: 28 } },
-  ETH:  { price: 1842.15,  change: '-1.4%', pos: false, community: { bears: 61, bulls: 39 } },
-  SOL:  { price: 142.38,   change: '+5.1%', pos: true,  community: { bears: 42, bulls: 58 } },
-  GOLD: { price: 3285.40,  change: '+0.8%', pos: true,  community: { bears: 35, bulls: 65 } },
+  BTC:  { price: 94250.30, change: '+2.3%', pos: true,  community: { bears: 72, bulls: 28 }, community1: { bears: 52, bulls: 48 } },
+  ETH:  { price: 1842.15,  change: '-1.4%', pos: false, community: { bears: 61, bulls: 39 }, community1: { bears: 49, bulls: 51 } },
+  SOL:  { price: 142.38,   change: '+5.1%', pos: true,  community: { bears: 42, bulls: 58 }, community1: { bears: 51, bulls: 49 } },
+  GOLD: { price: 3285.40,  change: '+0.8%', pos: true,  community: { bears: 35, bulls: 65 }, community1: { bears: 48, bulls: 52 } },
 };
 
 var NEWS = {
@@ -920,13 +925,15 @@ function animateBal(el, from, to) {
 
 function renderScreen1() {
   document.getElementById('screen-1').innerHTML =
-    '<div class="splash-hero">' + makeLottie(180, 'lottie-idle') + '</div>' +
+    '<div class="splash-hero">' + makeLottie(130, 'lottie-idle') + '</div>' +
     '<div class="splash-content">' +
-      '<div style="margin-bottom:16px">' + FULL_LOGO_SVG + '</div>' +
-      '<div class="splash-tagline">Trade Game</div>' +
-      '<h1 class="splash-headline">Угадай движение рынка!</h1>' +
-      '<p class="splash-sub">Угадай движение рынка 3 раза подряд<br>и забирай <strong style="color:var(--accent-green)">до 120 USDT</strong> реального бонуса!</p>' +
-      '<button class="btn-primary" onclick="startGame()">Начать игру 🚀</button>' +
+      '<div style="margin-bottom:14px">' + FULL_LOGO_SVG + '</div>' +
+      '<div class="splash-usdt">до 120 USDT</div>' +
+      '<div class="splash-usdt-label">бонус новичка на Gate.io</div>' +
+      '<p class="splash-balance-line">На счету: <strong>17 000 🪙</strong> — твой стартовый капитал</p>' +
+      '<h1 class="splash-headline">Предскажи рынок 3 раза подряд<br>и забирай реальные деньги</h1>' +
+      '<button class="btn-primary" onclick="startGame()">Сыграть на 120 USDT →</button>' +
+      '<p class="splash-trust">🔒 Бесплатно · Без депозита для игры</p>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }
@@ -952,7 +959,7 @@ function goToGameRound() {
 function renderScreen2() {
   var a    = state.asset;
   var info = ASSETS[a];
-  var com  = info.community;
+  var com  = (state.round === 1 && info.community1) ? info.community1 : info.community;
 
   var tabsHTML = ASSET_KEYS.map(function(k) {
     return '<button class="asset-tab' + (k === a ? ' active' : '') + '" onclick="switchAsset(\'' + k + '\')">' +
@@ -1020,20 +1027,20 @@ function switchAsset(key) {
 function renderLoseScreen() {
   document.getElementById('screen-3').innerHTML =
     makeLottie(160, 'lottie-lose', '0.65') +
-    '<div class="result-title">Не угадал 😔</div>' +
-    '<div class="result-amount amount-neg">Раунд 1 — промах</div>' +
+    '<div class="result-title">Рынок развернулся 📉</div>' +
+    '<div class="result-amount amount-neg">Так бывает у профи в 40% сделок</div>' +
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
     '<div class="result-btns">' +
       '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
-        '<span class="cta-big-icon">📈</span>' +
+        '<span class="cta-big-icon">💰</span>' +
         '<span class="cta-big-content">' +
-          '<span class="cta-big-tag">Готов к реальному трейдингу?</span>' +
-          '<span class="cta-big-title">Торгуй на Gate.io</span>' +
+          '<span class="cta-big-tag">На Gate.io ты торгуешь на деньги биржи</span>' +
+          '<span class="cta-big-title">Забрать 120 USDT и торговать</span>' +
           '<span class="cta-big-sub">Бонус до <strong style="color:var(--accent-green);font-size:14px">120 USDT</strong> за регистрацию</span>' +
         '</span>' +
         '<span class="cta-big-arrow">›</span>' +
       '</a>' +
-      '<button class="btn-game-continue" onclick="confirmPay()">Продолжить игру за 5 000 🪙</button>' +
+      '<button class="btn-game-continue" style="opacity:0.55;font-size:13px" onclick="confirmPay()">Доиграть за 5 000 🪙</button>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }

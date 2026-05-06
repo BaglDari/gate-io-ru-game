@@ -477,14 +477,45 @@ function drawChart() {
     ctx.beginPath(); ctx.moveTo(0, H * f); ctx.lineTo(plotW, H * f); ctx.stroke();
   });
 
-  // Split dashed vertical
-  if (rev.length > 0) {
-    var splitX = ((HIST_N - 1) / (totalN - 1)) * plotW;
+  // Split dashed vertical (always shown in predicting or revealing)
+  var showSplit = rev.length > 0 || state.phase === 'predicting';
+  var splitX = ((HIST_N - 1) / (totalN - 1)) * plotW;
+  if (showSplit) {
     ctx.strokeStyle = 'rgba(255,255,255,0.18)';
     ctx.setLineDash([4, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(splitX, 0); ctx.lineTo(splitX, H); ctx.stroke();
     ctx.setLineDash([]);
+  }
+
+  // UP/DOWN hint zones (only during predicting phase, before prediction made)
+  if (state.phase === 'predicting') {
+    var zoneX = splitX + 2;
+    var zoneW = plotW - splitX - 2;
+
+    // UP zone — top half green
+    var gUp = ctx.createLinearGradient(zoneX, 0, zoneX, H / 2);
+    gUp.addColorStop(0, 'rgba(0,212,170,0.18)');
+    gUp.addColorStop(1, 'rgba(0,212,170,0.02)');
+    ctx.fillStyle = gUp;
+    ctx.fillRect(zoneX, 0, zoneW, H / 2);
+
+    // DOWN zone — bottom half red
+    var gDn = ctx.createLinearGradient(zoneX, H / 2, zoneX, H);
+    gDn.addColorStop(0, 'rgba(255,77,106,0.02)');
+    gDn.addColorStop(1, 'rgba(255,77,106,0.18)');
+    ctx.fillStyle = gDn;
+    ctx.fillRect(zoneX, H / 2, zoneW, H / 2);
+
+    // Labels
+    var lx = zoneX + zoneW / 2;
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 13px system-ui';
+    ctx.fillStyle = 'rgba(0,212,170,0.85)';
+    ctx.fillText('↑ ВВЕРХ', lx, H * 0.25);
+    ctx.fillStyle = 'rgba(255,77,106,0.85)';
+    ctx.fillText('↓ ВНИЗ', lx, H * 0.80);
+    ctx.textAlign = 'left';
   }
 
   // Horizontal price line
@@ -716,8 +747,7 @@ function renderScreen1() {
       '<div class="gate-logo">Gate<span>.io</span></div>' +
       '<div class="splash-tagline">Trade Game</div>' +
       '<h1 class="splash-headline">Угадай движение рынка!</h1>' +
-      '<p class="splash-sub">30 секунд на предсказание.<br>Угадал 3 раза — забираешь <strong style="color:var(--accent-green)">до 120 USDT</strong> бонуса!</p>' +
-      '<div class="balance-badge">💰 Стартовый баланс: <span>17 000 🪙</span></div>' +
+      '<p class="splash-sub">Угадай движение рынка 3 раза подряд<br>и забирай <strong style="color:var(--accent-green)">до 120 USDT</strong> реального бонуса!</p>' +
       '<button class="btn-primary" onclick="startGame()">Начать игру 🚀</button>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
@@ -815,6 +845,9 @@ function renderLoseScreen() {
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
     '<div class="result-btns">' +
       '<button class="btn-pay" onclick="goToPay()">Продолжить за 5 000 🪙</button>' +
+      '<a href="' + buildCTAUrl() + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">' +
+        '<button class="btn-secondary">Скачать Gate.io и получить 120 USDT →</button>' +
+      '</a>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }
@@ -868,6 +901,9 @@ function renderWinScreen() {
         ? '<button class="btn-cta" onclick="goToBonus()">🎁 Забрать 120 USDT бонус!</button>'
         : '<button class="btn-primary" onclick="goNextRound()">Следующий раунд →</button>'
       ) +
+      '<a href="' + buildCTAUrl() + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">' +
+        '<button class="btn-secondary">Скачать Gate.io и получить 120 USDT →</button>' +
+      '</a>' +
     '</div>';
 
   if (window._lottieReady) _flushLottie();

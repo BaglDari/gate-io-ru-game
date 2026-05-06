@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Gate.io — Trade Game</title>
+<link rel="preload" href="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.js" as="script">
+<link rel="preload" href="https://lottie.host/156af721-4baf-474c-b381-02c86a231c2e/azpi9TEs18.lottie" as="fetch" crossorigin>
+<script defer src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -783,38 +786,9 @@ function formatBalance(n) {
 /* ── ЗАМЕНИ URL НИЖЕ НА СВОЙ С LOTTIEFILES ── */
 var ROBOT_LOTTIE_URL = 'https://lottie.host/156af721-4baf-474c-b381-02c86a231c2e/azpi9TEs18.lottie';
 
-var lottiePlayerReady = false;
-
 function makeLottie(size, cls, speed) {
   speed = speed || '1';
-  /* всегда рендерим SVG сразу — страница работает без интернета */
-  return '<div class="' + cls + ' lottie-slot" data-size="' + size + '" data-speed="' + speed + '" style="width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center">' + robotSVG(size) + '</div>';
-}
-
-function upgradeLottieSlots() {
-  if (ROBOT_LOTTIE_URL === 'YOUR_LOTTIE_URL_HERE') return;
-  document.querySelectorAll('.lottie-slot').forEach(function(el) {
-    var size = el.dataset.size;
-    var speed = el.dataset.speed || '1';
-    var cls = el.className.replace('lottie-slot', '').trim();
-    var player = document.createElement('dotlottie-player');
-    player.setAttribute('src', ROBOT_LOTTIE_URL);
-    player.setAttribute('background', 'transparent');
-    player.setAttribute('speed', speed);
-    player.setAttribute('loop', '');
-    player.setAttribute('autoplay', '');
-    player.className = cls;
-    player.style.cssText = 'width:' + size + 'px;height:' + size + 'px';
-    el.parentNode.replaceChild(player, el);
-  });
-}
-
-function loadLottieScript() {
-  if (ROBOT_LOTTIE_URL === 'YOUR_LOTTIE_URL_HERE') return;
-  var s = document.createElement('script');
-  s.src = 'https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.js';
-  s.onload = function() { lottiePlayerReady = true; upgradeLottieSlots(); };
-  document.body.appendChild(s);
+  return '<dotlottie-player src="' + ROBOT_LOTTIE_URL + '" background="transparent" speed="' + speed + '" loop autoplay class="' + cls + '" style="width:' + size + 'px;height:' + size + 'px"></dotlottie-player>';
 }
 
 /* Screen 1 — Splash */
@@ -1196,7 +1170,6 @@ function renderScreen4() {
       '<button class="btn-cta" onclick="goToBonus()">🚀 Попробовать реальный трейдинг!</button>' +
     '</div>';
 
-  if (lottiePlayerReady) setTimeout(upgradeLottieSlots, 50);
   setTimeout(launchConfetti, 100);
   var span = document.getElementById('win-balance-val');
   setTimeout(function() { animateBalanceEl(span, prevBalance, state.balance); }, 200);
@@ -1253,7 +1226,6 @@ function renderScreen5() {
 
 /* Init */
 renderScreen1();
-loadLottieScript();
 </script>
 </body>
 </html>

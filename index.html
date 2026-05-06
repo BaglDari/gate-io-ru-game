@@ -151,6 +151,10 @@ body {
 .cta-big-title { display: block; font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
 .cta-big-sub { display: block; font-size: 12px; color: var(--text-secondary); }
 .cta-big-arrow { font-size: 26px; color: var(--accent-green); flex-shrink: 0; }
+.lose-cta-label { font-size: 12px; color: var(--accent-green); font-weight: 700; text-align: center; margin-bottom: 10px; white-space: nowrap; }
+.lose-cta-sub-note { font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 8px; }
+.btn-cta-lose { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 18px 16px; background: linear-gradient(135deg, #00e5b8 0%, #00c49a 60%, #00a882 100%); color: #000; font-size: 20px; font-weight: 800; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 4px 24px rgba(0,212,170,0.4); text-decoration: none; transition: opacity 0.15s, transform 0.1s; }
+.btn-cta-lose:active { opacity: 0.85; transform: scale(0.98); }
 
 .btn-game-continue {
   width: 100%; padding: 12px;
@@ -1045,16 +1049,10 @@ function renderLoseScreen() {
     '<div class="result-amount amount-neg">Так бывает у профи в 40% сделок</div>' +
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
     '<div class="result-btns">' +
-      '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
-        '<span class="cta-big-icon">💰</span>' +
-        '<span class="cta-big-content">' +
-          '<span class="cta-big-tag">На&nbsp;Gate.io ты торгуешь на&nbsp;деньги&nbsp;биржи</span>' +
-          '<span class="cta-big-title">Забрать бонус и&nbsp;торговать</span>' +
-          '<span class="cta-big-sub">Бонус до <strong style="color:var(--accent-green);font-size:14px">120 USDT</strong> за&nbsp;регистрацию</span>' +
-        '</span>' +
-        '<span class="cta-big-arrow">›</span>' +
-      '</a>' +
-      '<button class="btn-game-continue" style="opacity:0.55;font-size:13px" onclick="confirmPay()">Доиграть за 5 000 🪙</button>' +
+      '<p class="lose-cta-label">Торгуй на деньги Gate.io — без риска</p>' +
+      '<a class="btn-cta-lose" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">💰 Забрать бонус и&nbsp;торговать</a>' +
+      '<p class="lose-cta-sub-note">Бонус до <strong style="color:var(--accent-green)">120 USDT</strong> за&nbsp;регистрацию</p>' +
+      '<button class="btn-game-continue" style="opacity:0.55;font-size:13px;margin-top:4px" onclick="confirmPay()">Доиграть за 5 000 🪙</button>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }

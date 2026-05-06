@@ -1049,9 +1049,9 @@ function renderLoseScreen() {
     '<div class="result-amount amount-neg">Так бывает у профи в 40% сделок</div>' +
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
     '<div class="result-btns">' +
-      '<p class="lose-cta-label">Торгуй на деньги Gate.io — без риска</p>' +
-      '<a class="btn-cta-lose" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">💰 Забрать 120 USDT</a>' +
-      '<button class="btn-game-continue" style="opacity:0.55;font-size:13px;margin-top:4px" onclick="confirmPay()">Доиграть за 5 000 🪙</button>' +
+      '<button class="btn-primary" style="font-size:18px;font-weight:800" onclick="confirmPay()">Доиграть за 5 000 🪙</button>' +
+      '<p class="lose-cta-label" style="margin-top:14px;margin-bottom:8px">Торгуй на деньги Gate.io — без риска</p>' +
+      '<a class="btn-game-continue" href="' + buildCTAUrl() + '" target="_blank" rel="noopener" style="color:var(--accent-green);border-color:rgba(0,212,170,0.4);font-size:15px;font-weight:700;text-decoration:none;display:block;text-align:center">💰 Забрать 120 USDT</a>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }

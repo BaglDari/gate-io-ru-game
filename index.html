@@ -730,14 +730,34 @@ function drawChart() {
     ctx.fillStyle = '#3d7fff';
     ctx.fill();
 
-    // Labels
+    // Labels with dark pill background for readability
     var midX = (splitX + fx1) / 2;
     ctx.font = 'bold 11px system-ui';
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(0,212,170,0.9)';
-    ctx.fillText('↑ ВВЕРХ', midX, upY - 7);
-    ctx.fillStyle = 'rgba(255,77,106,0.9)';
-    ctx.fillText('↓ ВНИЗ', midX, dnY + 13);
+    var drawForkLabel = function(text, cx, cy, col) {
+      var tw = ctx.measureText(text).width;
+      var px = 7, py = 3, rh = 18, r = 5;
+      var rw = tw + px * 2;
+      var rx = cx - tw / 2 - px;
+      var ry = cy - 13 - py;
+      ctx.fillStyle = 'rgba(8,12,24,0.82)';
+      ctx.beginPath();
+      ctx.moveTo(rx + r, ry);
+      ctx.lineTo(rx + rw - r, ry);
+      ctx.arcTo(rx + rw, ry, rx + rw, ry + r, r);
+      ctx.lineTo(rx + rw, ry + rh - r);
+      ctx.arcTo(rx + rw, ry + rh, rx + rw - r, ry + rh, r);
+      ctx.lineTo(rx + r, ry + rh);
+      ctx.arcTo(rx, ry + rh, rx, ry + rh - r, r);
+      ctx.lineTo(rx, ry + r);
+      ctx.arcTo(rx, ry, rx + r, ry, r);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = col;
+      ctx.fillText(text, cx, cy);
+    };
+    drawForkLabel('↑ ВВЕРХ', midX, upY - 2, 'rgba(0,212,170,1)');
+    drawForkLabel('↓ ВНИЗ',  midX, dnY + 16, 'rgba(255,77,106,1)');
     ctx.textAlign = 'left';
   }
 
@@ -875,7 +895,7 @@ function makePrediction(dir) {
 
 /* ===================== HELPERS ===================== */
 
-function fmtBal(n) { return n.toLocaleString('ru-RU') + ' 💵'; }
+function fmtBal(n) { return n.toLocaleString('ru-RU') + ' 🪙'; }
 function fmtMain(key) {
   var p = ASSETS[key].price;
   return '$' + p.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -952,7 +972,7 @@ function renderScreen2() {
     '<div class="game-topbar">' +
       '<div class="topbar-avatar"><img src="gate-io-logo.png" alt="Gate.io"></div>' +
       '<div class="topbar-name"></div>' +
-      '<div class="topbar-balance">💵 <span id="topbar-bal">' + state.balance.toLocaleString('ru-RU') + '</span></div>' +
+      '<div class="topbar-balance">🪙 <span id="topbar-bal">' + state.balance.toLocaleString('ru-RU') + '</span></div>' +
     '</div>' +
     '<div class="asset-tabs" id="asset-tabs">' + tabsHTML + '</div>' +
     '<div class="price-row">' +
@@ -1013,7 +1033,7 @@ function renderLoseScreen() {
         '</span>' +
         '<span class="cta-big-arrow">›</span>' +
       '</a>' +
-      '<button class="btn-game-continue" onclick="confirmPay()">Продолжить игру за 5 000 💵</button>' +
+      '<button class="btn-game-continue" onclick="confirmPay()">Продолжить игру за 5 000 🪙</button>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }
@@ -1057,9 +1077,9 @@ function renderWinScreen() {
   var prevBal = state.balance - 3000;
 
   var ctaIcon  = isFinal ? '🏆' : '🚀';
-  var ctaTag   = isFinal ? '3 из 3 — настоящий трейдер!' : 'Ты угадываешь как профи!';
-  var ctaTitle = isFinal ? 'Забери 120 USDT бонус' : 'Попробуй реальный трейдинг';
-  var ctaSub   = isFinal ? 'Зарегистрируйся на Gate.io прямо сейчас' : 'Бонус до 120 USDT на Gate.io';
+  var ctaTag   = isFinal ? '🔥 3 из 3 — ты настоящий трейдер!' : '⚡ Ты угадываешь как профи!';
+  var ctaTitle = isFinal ? '💰 Забирай 120 USDT прямо сейчас' : 'Торгуй по-настоящему на Gate.io';
+  var ctaSub   = isFinal ? 'Деньги уже ждут — жми и регистрируйся' : 'Бонус до <strong style="color:var(--accent-green);font-size:13px">120 USDT</strong> за регистрацию';
   var gameBtn  = isFinal
     ? '<button class="btn-game-continue" onclick="goToBonus()">Детали бонуса →</button>'
     : '<button class="btn-game-continue" onclick="goNextRound()">Следующий раунд →</button>';
@@ -1068,7 +1088,7 @@ function renderWinScreen() {
     '<canvas id="confetti-canvas"></canvas>' +
     makeLottie(180, 'lottie-win', '1.5') +
     '<div class="result-title">Угадал! 🎉</div>' +
-    '<div class="result-amount amount-pos">+3 000 💵</div>' +
+    '<div class="result-amount amount-pos">+3 000 🪙</div>' +
     '<div class="result-bal">Баланс: <span id="win-bal">' + fmtBal(prevBal) + '</span></div>' +
     '<div class="result-btns">' +
       '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
@@ -1117,12 +1137,12 @@ function renderBonusScreen() {
   var url = buildCTAUrl();
   document.getElementById('screen-6').innerHTML =
     '<div style="display:flex;justify-content:center;margin-bottom:14px">' + FULL_LOGO_SVG + '</div>' +
-    '<h2 class="bonus-headline">🏆 Ты в плюсе!</h2>' +
-    '<p class="bonus-sub">Финальный баланс: <strong style="color:var(--accent-green)">' + fmtBal(state.balance) + '</strong><br>Зарегистрируйся на Gate.io и получи реальный бонус</p>' +
+    '<h2 class="bonus-headline">🔥 Забирай 120 USDT!</h2>' +
+    '<p class="bonus-sub">Ты 3 из 3 — умеешь читать рынок.<br>Финальный баланс: <strong style="color:var(--accent-green)">' + fmtBal(state.balance) + '</strong><br>Gate.io даёт реальные деньги новым трейдерам:</p>' +
     '<div class="bonus-list">' +
       '<div class="bonus-item"><span class="bonus-icon">📲</span><span class="bonus-label">Скачать приложение</span><span class="bonus-amount">10 USDT</span></div>' +
       '<div class="bonus-item"><span class="bonus-icon">✅</span><span class="bonus-label">Регистрация</span><span class="bonus-amount">50 USDT</span></div>' +
-      '<div class="bonus-item"><span class="bonus-icon">💵</span><span class="bonus-label">Первый депозит</span><span class="bonus-amount">30 USDT</span></div>' +
+      '<div class="bonus-item"><span class="bonus-icon">🪙</span><span class="bonus-label">Первый депозит</span><span class="bonus-amount">30 USDT</span></div>' +
       '<div class="bonus-item"><span class="bonus-icon">📈</span><span class="bonus-label">Первая сделка</span><span class="bonus-amount">30 USDT</span></div>' +
     '</div>' +
     '<div class="bonus-total">' +
@@ -1131,7 +1151,7 @@ function renderBonusScreen() {
     '</div>' +
     '<div class="bonus-cta-wrap">' +
       '<a href="' + url + '" target="_blank" rel="noopener">' +
-        '<button class="btn-cta">🎁 Зарегистрироваться и получить бонус</button>' +
+        '<button class="btn-cta">💸 Получить 120 USDT на Gate.io →</button>' +
       '</a>' +
     '</div>' +
     '<p class="bonus-disclaimer">Бонусы начисляются в соответствии с условиями акции Gate.io. Криптовалюты подвержены высокой волатильности. Инвестируйте ответственно.</p>';

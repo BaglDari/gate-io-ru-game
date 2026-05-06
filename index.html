@@ -56,19 +56,6 @@ body {
   background: var(--bg);
   overflow: hidden;
 }
-.splash-bg-coins {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-.splash-coin {
-  position: absolute;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  font-weight: 900;
-  color: #fff;
-}
 .splash-bg-chart {
   position: absolute;
   bottom: 200px;
@@ -83,6 +70,7 @@ body {
   top: 0; left: 0; right: 0;
   height: 38%;
   display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse 75% 65% at 50% 55%, rgba(255,255,255,0.13) 0%, rgba(61,127,255,0.12) 45%, transparent 72%);
 }
 
 .splash-content {
@@ -943,26 +931,16 @@ function animateBal(el, from, to) {
 /* ===================== SCREEN 1: SPLASH ===================== */
 
 function renderScreen1() {
+  var logoInline = FULL_LOGO_SVG.replace('height:22px;display:block', 'height:17px;display:inline-block;vertical-align:middle;margin-left:5px');
   document.getElementById('screen-1').innerHTML =
-    '<div class="splash-bg-coins">' +
-      '<div class="splash-coin" style="width:44px;height:44px;background:rgba(247,147,26,0.18);top:18px;left:16px;font-size:20px">₿</div>' +
-      '<div class="splash-coin" style="width:34px;height:34px;background:rgba(98,126,234,0.18);top:58px;right:18px;font-size:16px">Ξ</div>' +
-      '<div class="splash-coin" style="width:28px;height:28px;background:rgba(153,69,255,0.18);top:110px;left:26px;font-size:12px">◎</div>' +
-      '<div class="splash-coin" style="width:30px;height:30px;background:rgba(255,215,0,0.14);top:88px;right:34px;font-size:12px;color:#ffd700">Au</div>' +
-      '<div class="splash-coin" style="width:18px;height:18px;background:rgba(247,147,26,0.1);top:155px;left:58px;font-size:9px">₿</div>' +
-      '<div class="splash-coin" style="width:20px;height:20px;background:rgba(98,126,234,0.1);top:138px;right:56px;font-size:9px">Ξ</div>' +
-    '</div>' +
     '<svg class="splash-bg-chart" viewBox="0 0 360 70" preserveAspectRatio="none">' +
       '<polyline points="0,58 30,50 65,52 100,32 135,36 170,20 205,24 240,10 275,14 310,4 360,2" fill="none" stroke="#3d7fff" stroke-width="2.5" stroke-linejoin="round"/>' +
     '</svg>' +
     '<div class="splash-hero">' + makeLottie(130, 'lottie-idle') + '</div>' +
     '<div class="splash-content">' +
-      '<div style="margin-bottom:14px">' + FULL_LOGO_SVG + '</div>' +
-      '<div class="splash-usdt">до 120 USDT</div>' +
-      '<div class="splash-usdt-label">бонус новичка на Gate.io</div>' +
       '<h1 class="splash-headline">Чувствуешь рынок?</h1>' +
-      '<p class="splash-sub" style="margin-bottom:20px">Докажи — и получи реальный бонус<br>на Gate.io</p>' +
-      '<button class="btn-primary" onclick="startGame()">Проверить себя →</button>' +
+      '<p class="splash-sub" style="margin-bottom:20px">Докажи — и получи реальный бонус на' + logoInline + '</p>' +
+      '<button class="btn-primary" onclick="startGame()">🎁 Проверить себя и получи до 120 USDT</button>' +
       '<p class="splash-trust">🔒 Бесплатно · Без депозита для игры</p>' +
     '</div>';
   if (window._lottieReady) _flushLottie();

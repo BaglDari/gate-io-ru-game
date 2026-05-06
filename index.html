@@ -81,8 +81,8 @@ body {
 .splash-tagline { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent-blue); margin-bottom: 8px; }
 .splash-headline { font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
 .splash-sub { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; padding: 0 8px; }
-.splash-usdt { font-size: 46px; font-weight: 900; color: var(--accent-green); line-height: 1; margin-bottom: 4px; letter-spacing: -1px; }
-.splash-usdt-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 14px; letter-spacing: 0.3px; }
+.splash-usdt { font-size: 28px; font-weight: 800; color: var(--accent-green); line-height: 1; margin-bottom: 3px; letter-spacing: -0.5px; }
+.splash-usdt-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 18px; letter-spacing: 0.3px; }
 .splash-balance-line { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
 .splash-balance-line strong { color: var(--accent-green); font-weight: 700; }
 .splash-trust { font-size: 11px; color: rgba(136,146,164,0.7); margin-top: 10px; margin-bottom: 0; }
@@ -930,9 +930,8 @@ function renderScreen1() {
       '<div style="margin-bottom:14px">' + FULL_LOGO_SVG + '</div>' +
       '<div class="splash-usdt">до 120 USDT</div>' +
       '<div class="splash-usdt-label">бонус новичка на Gate.io</div>' +
-      '<p class="splash-balance-line">На счету: <strong>17 000 🪙</strong> — твой стартовый капитал</p>' +
       '<h1 class="splash-headline">Предскажи рынок 3 раза подряд<br>и забирай реальные деньги</h1>' +
-      '<button class="btn-primary" onclick="startGame()">Сыграть на 120 USDT →</button>' +
+      '<button class="btn-primary" onclick="startGame()">Заработать 120 USDT →</button>' +
       '<p class="splash-trust">🔒 Бесплатно · Без депозита для игры</p>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
@@ -1035,7 +1034,7 @@ function renderLoseScreen() {
         '<span class="cta-big-icon">💰</span>' +
         '<span class="cta-big-content">' +
           '<span class="cta-big-tag">На Gate.io ты торгуешь на деньги биржи</span>' +
-          '<span class="cta-big-title">Забрать 120 USDT и торговать</span>' +
+          '<span class="cta-big-title">Забрать бонус и торговать</span>' +
           '<span class="cta-big-sub">Бонус до <strong style="color:var(--accent-green);font-size:14px">120 USDT</strong> за регистрацию</span>' +
         '</span>' +
         '<span class="cta-big-arrow">›</span>' +

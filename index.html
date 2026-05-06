@@ -394,7 +394,7 @@ var _pendingLottie = [];
 
 function makeLottie(size, cls, speed) {
   var id = 'lc' + (++_lottieIdCtr);
-  _pendingLottie.push({ id: id, speed: parseFloat(speed) || 1 });
+  _pendingLottie.push({ id: id, speed: parseFloat(speed) || 1, cls: cls });
   return '<div id="' + id + '" class="' + cls + '" style="width:' + size + 'px;height:' + size + 'px"></div>';
 }
 
@@ -402,10 +402,70 @@ function _flushLottie() {
   _pendingLottie = _pendingLottie.filter(function(p) {
     var el = document.getElementById(p.id);
     if (!el) return false;
-    var anim = lottie.loadAnimation({ container: el, renderer: 'svg', loop: true, autoplay: true, animationData: ROBOT_ANIM_DATA });
+    var data = p.cls === 'lottie-win'  ? buildWinAnim()
+             : p.cls === 'lottie-lose' ? buildLoseAnim()
+             : ROBOT_ANIM_DATA;
+    var anim = lottie.loadAnimation({ container: el, renderer: 'svg', loop: true, autoplay: true, animationData: data });
     if (p.speed !== 1) anim.setSpeed(p.speed);
     return false;
   });
+}
+
+function buildWinAnim() {
+  var d = JSON.parse(JSON.stringify(ROBOT_ANIM_DATA));
+  d.layers.forEach(function(l) {
+    switch (l.ind) {
+      case 10: // тело — большой прыжок вверх
+        l.ks.p.k[1].s[1] = 427;
+        break;
+      case 9:  // голова — сильный возбуждённый наклон
+        l.ks.r.k[1].s[0] = -22;
+        l.ks.p.k[1].s[1] = 28;
+        l.ks.p.k[2].s[1] = 28;
+        break;
+      case 5:  // рука 1 — широкий взмах вверх
+        l.ks.r.k[1].s[0] = -28;
+        l.ks.p.k[3].s[1] = 50;
+        break;
+      case 4:  // рука 2 — поднята выше
+        l.ks.r.k[2].s[0] = 215;
+        l.ks.p.k[3].s[1] = 62;
+        break;
+      case 14: // тень — шире от большого прыжка
+        l.ks.s.k[1].s[0] = 118;
+        l.ks.s.k[1].s[1] = 118;
+        break;
+    }
+  });
+  return d;
+}
+
+function buildLoseAnim() {
+  var d = JSON.parse(JSON.stringify(ROBOT_ANIM_DATA));
+  d.layers.forEach(function(l) {
+    switch (l.ind) {
+      case 10: // тело — почти не прыгает
+        l.ks.p.k[1].s[1] = 572;
+        break;
+      case 9:  // голова — свисает вперёд (грустный кивок)
+        l.ks.r.k[1].s[0] = 18;
+        l.ks.p.k[1].s[1] = 68;
+        l.ks.p.k[2].s[1] = 68;
+        break;
+      case 5:  // рука 1 — обвисает вниз
+        l.ks.r.k[1].s[0] = 12;
+        l.ks.r.k[2].s[0] = -3;
+        break;
+      case 4:  // рука 2 — опускается
+        l.ks.r.k[2].s[0] = 176;
+        break;
+      case 14: // тень — почти без изменений
+        l.ks.s.k[1].s[0] = 101;
+        l.ks.s.k[1].s[1] = 101;
+        break;
+    }
+  });
+  return d;
 }
 
 window._flushLottie = _flushLottie;
@@ -907,7 +967,7 @@ function switchAsset(key) {
 
 function renderLoseScreen() {
   document.getElementById('screen-3').innerHTML =
-    makeLottie(160, 'lottie-lose') +
+    makeLottie(160, 'lottie-lose', '0.65') +
     '<div class="result-title">Не угадал 😔</div>' +
     '<div class="result-amount amount-neg">Раунд 1 — промах</div>' +
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
@@ -965,7 +1025,7 @@ function renderWinScreen() {
 
   document.getElementById('screen-5').innerHTML =
     '<canvas id="confetti-canvas"></canvas>' +
-    makeLottie(180, 'lottie-win', '1.2') +
+    makeLottie(180, 'lottie-win', '1.5') +
     '<div class="result-title">Угадал! 🎉</div>' +
     '<div class="result-amount amount-pos">+3 000 🪙</div>' +
     '<div class="result-bal">Баланс: <span id="win-bal">' + fmtBal(prevBal) + '</span></div>' +

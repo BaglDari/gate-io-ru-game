@@ -50,35 +50,35 @@ body {
 /* ======= SCREEN 1: SPLASH ======= */
 #screen-1 {
   align-items: center;
-  justify-content: flex-end;
-  padding: 0;
+  justify-content: space-between;
+  padding: 44px 24px 48px;
   position: relative;
   background: var(--bg);
   overflow: hidden;
 }
-.splash-bg-chart {
-  position: absolute;
-  bottom: 200px;
-  left: -8px; right: -8px;
-  opacity: 0.055;
-  pointer-events: none;
-  z-index: 0;
+@keyframes coinFall {
+  0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+  8%   { opacity: 0.45; }
+  92%  { opacity: 0.25; }
+  100% { transform: translateY(110vh) rotate(420deg); opacity: 0; }
 }
+.coin-rain { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.coin-rain span { position: absolute; top: 0; animation: coinFall linear infinite; opacity: 0; }
+
+.splash-brand { width: 100%; text-align: center; z-index: 1; flex-shrink: 0; }
 
 .splash-hero {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 38%;
   display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(ellipse 75% 65% at 50% 55%, rgba(255,255,255,0.13) 0%, rgba(61,127,255,0.12) 45%, transparent 72%);
+  z-index: 1; flex-shrink: 0;
+  background: radial-gradient(ellipse 85% 75% at 50% 50%, rgba(61,127,255,0.13) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 18px;
 }
 
 .splash-content {
   width: 100%;
-  padding: 20px 20px 44px;
   display: flex; flex-direction: column; align-items: center;
-  background: linear-gradient(to bottom, transparent, var(--bg) 12%);
-  z-index: 1;
+  z-index: 1; flex-shrink: 0;
   text-align: center;
 }
 
@@ -931,16 +931,24 @@ function animateBal(el, from, to) {
 /* ===================== SCREEN 1: SPLASH ===================== */
 
 function renderScreen1() {
-  var logoInline = FULL_LOGO_SVG.replace('height:22px;display:block', 'height:17px;display:inline-block;vertical-align:middle;margin-left:5px');
+  var logo = FULL_LOGO_SVG.replace('height:22px;display:block', 'height:26px;display:block;margin:0 auto');
+  var symbols = ['₿','Ξ','◎','₿','🪙','Ξ','◎','₿','Ξ','🪙'];
+  var coinHtml = '';
+  for (var i = 0; i < 14; i++) {
+    var left  = (4 + Math.random() * 88).toFixed(1);
+    var delay = (Math.random() * 9).toFixed(2);
+    var dur   = (7 + Math.random() * 7).toFixed(1);
+    var size  = (12 + Math.random() * 10).toFixed(0);
+    coinHtml += '<span style="left:' + left + '%;animation-delay:' + delay + 's;animation-duration:' + dur + 's;font-size:' + size + 'px">' + symbols[i % symbols.length] + '</span>';
+  }
   document.getElementById('screen-1').innerHTML =
-    '<svg class="splash-bg-chart" viewBox="0 0 360 70" preserveAspectRatio="none">' +
-      '<polyline points="0,58 30,50 65,52 100,32 135,36 170,20 205,24 240,10 275,14 310,4 360,2" fill="none" stroke="#3d7fff" stroke-width="2.5" stroke-linejoin="round"/>' +
-    '</svg>' +
-    '<div class="splash-hero">' + makeLottie(130, 'lottie-idle') + '</div>' +
+    '<div class="coin-rain">' + coinHtml + '</div>' +
+    '<div class="splash-brand">' + logo + '</div>' +
+    '<div class="splash-hero">' + makeLottie(150, 'lottie-idle') + '</div>' +
     '<div class="splash-content">' +
-      '<h1 class="splash-headline">Чувствуешь рынок?</h1>' +
-      '<p class="splash-sub" style="margin-bottom:20px">Докажи — и получи реальный бонус на' + logoInline + '</p>' +
-      '<button class="btn-primary" onclick="startGame()">🎁 Проверить себя и получи до 120 USDT</button>' +
+      '<h1 class="splash-headline" style="font-size:26px;margin-bottom:12px">🐂 Бык или 🐻 Медведь?</h1>' +
+      '<p class="splash-sub" style="margin-bottom:22px">30 секунд — угадай куда пойдёт рынок<br>и забери до&nbsp;<strong style="color:var(--accent-green)">120 USDT</strong> бонуса!</p>' +
+      '<button class="btn-primary" onclick="startGame()">Начать игру 🚀</button>' +
       '<p class="splash-trust">🔒 Бесплатно · Без депозита для игры</p>' +
     '</div>';
   if (window._lottieReady) _flushLottie();

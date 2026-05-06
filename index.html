@@ -1109,15 +1109,20 @@ function renderWinScreen() {
     '<div class="result-amount amount-pos">+3 000 🪙</div>' +
     '<div class="result-bal">Баланс: <span id="win-bal">' + fmtBal(prevBal) + '</span></div>' +
     '<div class="result-btns">' +
-      '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
-        '<span class="cta-big-icon">' + ctaIcon + '</span>' +
-        '<span class="cta-big-content">' +
-          '<span class="cta-big-tag">' + ctaTag + '</span>' +
-          '<span class="cta-big-title">' + ctaTitle + '</span>' +
-          '<span class="cta-big-sub">' + ctaSub + '</span>' +
-        '</span>' +
-        '<span class="cta-big-arrow">›</span>' +
-      '</a>' +
+      (isFinal
+        ? '<p class="lose-cta-label">' + ctaTag + '</p>' +
+          '<a class="btn-cta-lose" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' + ctaTitle + '</a>' +
+          '<p class="lose-cta-sub-note">' + ctaSub + '</p>'
+        : '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
+            '<span class="cta-big-icon">' + ctaIcon + '</span>' +
+            '<span class="cta-big-content">' +
+              '<span class="cta-big-tag">' + ctaTag + '</span>' +
+              '<span class="cta-big-title">' + ctaTitle + '</span>' +
+              '<span class="cta-big-sub">' + ctaSub + '</span>' +
+            '</span>' +
+            '<span class="cta-big-arrow">›</span>' +
+          '</a>'
+      ) +
       gameBtn +
     '</div>';
 

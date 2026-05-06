@@ -123,6 +123,37 @@ body {
 }
 .btn-secondary:active { opacity: 0.75; }
 
+/* ======= BIG CTA CARD (primary on result screens) ======= */
+.cta-card-big {
+  display: flex; align-items: center;
+  width: 100%; padding: 16px;
+  background: linear-gradient(135deg, rgba(61,127,255,0.12) 0%, rgba(0,212,170,0.08) 100%);
+  border: 1px solid rgba(61,127,255,0.35);
+  border-radius: 18px;
+  text-decoration: none; color: inherit;
+  gap: 14px; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  margin-bottom: 10px;
+}
+.cta-card-big:active { opacity: 0.85; transform: scale(0.98); }
+.cta-big-icon { font-size: 32px; flex-shrink: 0; line-height: 1; }
+.cta-big-content { flex: 1; text-align: left; }
+.cta-big-tag { display: block; font-size: 11px; color: var(--accent-green); font-weight: 700; margin-bottom: 3px; }
+.cta-big-title { display: block; font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
+.cta-big-sub { display: block; font-size: 12px; color: var(--text-secondary); }
+.cta-big-arrow { font-size: 26px; color: var(--accent-green); flex-shrink: 0; }
+
+.btn-game-continue {
+  width: 100%; padding: 12px;
+  background: transparent; color: var(--text-secondary);
+  font-size: 14px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-game-continue:active { opacity: 0.75; }
+
+.btn-sub { display: block; font-size: 10px; opacity: 0.8; font-weight: 700; margin-top: 1px; letter-spacing: 0.4px; text-transform: uppercase; }
+
 /* ======= CTA CARD ======= */
 .cta-card {
   display: flex; align-items: center;
@@ -844,7 +875,7 @@ function makePrediction(dir) {
 
 /* ===================== HELPERS ===================== */
 
-function fmtBal(n) { return n.toLocaleString('ru-RU') + ' 🪙'; }
+function fmtBal(n) { return n.toLocaleString('ru-RU') + ' 💵'; }
 function fmtMain(key) {
   var p = ASSETS[key].price;
   return '$' + p.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -920,8 +951,8 @@ function renderScreen2() {
   document.getElementById('screen-2').innerHTML =
     '<div class="game-topbar">' +
       '<div class="topbar-avatar"><img src="gate-io-logo.png" alt="Gate.io"></div>' +
-      '<div class="topbar-name">Игрок</div>' +
-      '<div class="topbar-balance">🪙 <span id="topbar-bal">' + state.balance.toLocaleString('ru-RU') + '</span></div>' +
+      '<div class="topbar-name" style="display:flex;align-items:center">' + FULL_LOGO_SVG.replace('style="height:22px;display:block"', 'style="height:16px;display:block"') + '</div>' +
+      '<div class="topbar-balance">💵 <span id="topbar-bal">' + state.balance.toLocaleString('ru-RU') + '</span></div>' +
     '</div>' +
     '<div class="asset-tabs" id="asset-tabs">' + tabsHTML + '</div>' +
     '<div class="price-row">' +
@@ -947,8 +978,8 @@ function renderScreen2() {
         '<div class="timer-label" id="timer-label">30</div>' +
       '</div>' +
       '<div class="updown-btns">' +
-        '<button class="btn-down" id="btn-down" onclick="makePrediction(\'down\')"><span class="btn-emoji">↓</span>Вниз</button>' +
-        '<button class="btn-up"   id="btn-up"   onclick="makePrediction(\'up\')"><span class="btn-emoji">↑</span>Вверх</button>' +
+        '<button class="btn-down" id="btn-down" onclick="makePrediction(\'down\')"><span class="btn-emoji">↓</span>Вниз<span class="btn-sub">Продать</span></button>' +
+        '<button class="btn-up"   id="btn-up"   onclick="makePrediction(\'up\')"><span class="btn-emoji">↑</span>Вверх<span class="btn-sub">Купить</span></button>' +
       '</div>' +
     '</div>';
 }
@@ -973,15 +1004,16 @@ function renderLoseScreen() {
     '<div class="result-amount amount-neg">Раунд 1 — промах</div>' +
     '<div class="result-bal">Баланс: <span>' + fmtBal(state.balance) + '</span></div>' +
     '<div class="result-btns">' +
-      '<button class="btn-pay" onclick="confirmPay()">Продолжить за 5 000 🪙</button>' +
-      '<a class="cta-card" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
-        '<span class="cta-card-icon">📈</span>' +
-        '<span class="cta-card-text">' +
-          '<span class="cta-card-sub">Готов к реальному трейдингу?</span>' +
-          '<span class="cta-card-main">Попробуй Gate.io</span>' +
+      '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
+        '<span class="cta-big-icon">📈</span>' +
+        '<span class="cta-big-content">' +
+          '<span class="cta-big-tag">Готов к реальному трейдингу?</span>' +
+          '<span class="cta-big-title">Торгуй на Gate.io</span>' +
+          '<span class="cta-big-sub">Бонус до 120 USDT за регистрацию</span>' +
         '</span>' +
-        '<span class="cta-card-arrow">›</span>' +
+        '<span class="cta-big-arrow">›</span>' +
       '</a>' +
+      '<button class="btn-game-continue" onclick="confirmPay()">Продолжить игру за 5 000 💵</button>' +
     '</div>';
   if (window._lottieReady) _flushLottie();
 }
@@ -1024,25 +1056,31 @@ function renderWinScreen() {
   var isFinal = state.round >= 3;
   var prevBal = state.balance - 3000;
 
+  var ctaIcon  = isFinal ? '🏆' : '🚀';
+  var ctaTag   = isFinal ? '3 из 3 — настоящий трейдер!' : 'Ты угадываешь как профи!';
+  var ctaTitle = isFinal ? 'Забери 120 USDT бонус' : 'Попробуй реальный трейдинг';
+  var ctaSub   = isFinal ? 'Зарегистрируйся на Gate.io прямо сейчас' : 'Бонус до 120 USDT на Gate.io';
+  var gameBtn  = isFinal
+    ? '<button class="btn-game-continue" onclick="goToBonus()">Детали бонуса →</button>'
+    : '<button class="btn-game-continue" onclick="goNextRound()">Следующий раунд →</button>';
+
   document.getElementById('screen-5').innerHTML =
     '<canvas id="confetti-canvas"></canvas>' +
     makeLottie(180, 'lottie-win', '1.5') +
     '<div class="result-title">Угадал! 🎉</div>' +
-    '<div class="result-amount amount-pos">+3 000 🪙</div>' +
+    '<div class="result-amount amount-pos">+3 000 💵</div>' +
     '<div class="result-bal">Баланс: <span id="win-bal">' + fmtBal(prevBal) + '</span></div>' +
     '<div class="result-btns">' +
-      (isFinal
-        ? '<button class="btn-cta" onclick="goToBonus()">🎁 Забрать 120 USDT бонус!</button>'
-        : '<button class="btn-primary" onclick="goNextRound()">Следующий раунд →</button>'
-      ) +
-      '<a class="cta-card" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
-        '<span class="cta-card-icon">📈</span>' +
-        '<span class="cta-card-text">' +
-          '<span class="cta-card-sub">Готов к реальному трейдингу?</span>' +
-          '<span class="cta-card-main">Попробуй Gate.io</span>' +
+      '<a class="cta-card-big" href="' + buildCTAUrl() + '" target="_blank" rel="noopener">' +
+        '<span class="cta-big-icon">' + ctaIcon + '</span>' +
+        '<span class="cta-big-content">' +
+          '<span class="cta-big-tag">' + ctaTag + '</span>' +
+          '<span class="cta-big-title">' + ctaTitle + '</span>' +
+          '<span class="cta-big-sub">' + ctaSub + '</span>' +
         '</span>' +
-        '<span class="cta-card-arrow">›</span>' +
+        '<span class="cta-big-arrow">›</span>' +
       '</a>' +
+      gameBtn +
     '</div>';
 
   if (window._lottieReady) _flushLottie();
